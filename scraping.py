@@ -1,29 +1,32 @@
 import json
 import asyncio
-import codecs
-from twscrape import API, gather
+from twscrape import API
+from tweet_db_services import TweetDbServices
+from users_db_services import UserDbServices
+from models import UserModel, TweetModel
+
 
 async def main() :
     api = API()
-    json_file = open('tweets.json', 'w')
-
-    q = "عمانتل"
+    userDbServices = UserDbServices()
+    tweetDbServices = TweetDbServices()
     
+    # json_file = open('tweets.json', 'w', encoding='utf-8')
+
+    q = "مسابقة البرمجة"
+
+    count  = 0    
     async for tweet in api.search(q, limit = 1):
         data = json.loads(tweet.json())
-        json.dump(data, json_file, indent=4)
+        tweet = TweetModel(data)
+        user = UserModel(data['user'])
+        userDbServices.create_user(user.dataDict)
+        tweetDbServices.create_tweet(tweet.dataDict)
+        # json.dump(data, json_file, ensure_ascii=False, indent=4)
+        count += 1
+    print(count)
 
-
-    json_file.close()
-
-
-    json_file = open('tweets.json', 'r')
-
-    content = json_file.read()
-
-    print(content)
-    json_file.close()
-
+    # json_file.close()
 
 
 if __name__ == '__main__':

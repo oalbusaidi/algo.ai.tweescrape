@@ -1,3 +1,7 @@
 accounts.db
+scraped_data.db
 accounts.txt
 Important files
+test.py
+tweets.json
+twitter_search_services.py
