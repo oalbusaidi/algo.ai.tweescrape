@@ -13,10 +13,10 @@ async def main() :
     
     # json_file = open('tweets.json', 'w', encoding='utf-8')
 
-    q = "مسابقة البرمجة"
+    q = "#مدينة_السلطان_هيثم"
 
     count  = 0    
-    async for tweet in api.search(q, limit = 1):
+    async for tweet in api.search(q, limit = 2000):
         data = json.loads(tweet.json())
         tweet = TweetModel(data)
         user = UserModel(data['user'])
