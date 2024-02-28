@@ -4,10 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-twscrape = "*"
+twscrape = "==0.11.1"
 asyncio = "*"
 pandas = "*"
 ipykernel = "*"
+emoji = "*"
+demoji = "*"
+nltk = "*"
+scikit-learn = "*"
+streamlit = "*"
+googletrans = "==4.0.0-rc1"
+matplotlib = "*"
+altair = "*"
+deep-translator = "*"
 
 [dev-packages]
 
