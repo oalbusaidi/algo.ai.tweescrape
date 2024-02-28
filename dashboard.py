@@ -4,22 +4,31 @@ from analysis_services.analysis_services import (
     get_most_common_words_with_counts_tfidf, get_sentiment_results,
     get_topic_modelling
 )
+from widgets.user_card import create_twitter_profile_card, user_card_css_style
 import matplotlib.pyplot as plt
 import sqlite3
 import base64
+import html
 import numpy as np
 import pandas as pd
 import streamlit as st
 import altair as alt
 import matplotlib
+import folium
+from  streamlit_folium import st_folium, folium_static
+from geopy.geocoders import Nominatim
+
 matplotlib.use('Agg')
 
-st.set_option('deprecation.showPyplotGlobalUse', False)
 
+st.set_option('deprecation.showPyplotGlobalUse', False)
+st. set_page_config(layout="wide") 
 
 def img_to_base64(image_path):
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode()
+
+
 
 
 # ------------------- SideBar -----------------------------------
@@ -32,11 +41,11 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-    st.write(
-        """# Topics Searched"""
-    )
-    selected_topics = [topic for topic in [
-        'Python', 'Data Science', 'Machine Learning', 'Streamlit'] if st.checkbox(topic)]
+    # st.write(
+    #     """# Topics Searched"""
+    # )
+    # selected_topics = [topic for topic in [
+    #     'Python', 'Data Science', 'Machine Learning', 'Streamlit'] if st.checkbox(topic)]
 
 # ------------------- SideBar -----------------------------------
 
@@ -49,47 +58,11 @@ st.write("""
 st.chat_input("Search For a Topic...", key='searchTerm')
 
 
-col1, col2 = st.columns(2)
-with col1: 
-    # --------- Top Influencers -------------------
-    top_influencers = get_top_influencers()
+col1, col2,  = st.columns(2)
 
-    if not top_influencers.empty:
-        connection = sqlite3.connect('scraping_services/scraped_data.db')
-        user_df = pd.read_sql_query("SELECT * from twitter_user", connection)
-        # Merge with userdf to get usernames
-        top_influencers_with_username = pd.merge(
-            top_influencers, user_df, on='userid', how='left')
 
-        # Visualize the top influencers using Altair in Streamlit
-        chart = alt.Chart(top_influencers_with_username).mark_bar().encode(
-            y=alt.Y('influenceScore:Q', title='Influence Score', sort=None),
-            x=alt.X('username_x:O', title='Username', sort='y'),
-        ).properties(
-            width=500,
-            title='Top Influencers'
-        )
+# with col2:
 
-        # Display Altair chart in Streamlit
-        st.altair_chart(chart, use_container_width=True)
-    else:
-        st.write("No data available for plotting.")
-    # ------------- Top Influencers ------------------
-with col2:
-    # ------------- Top Locations ------------------
-    top_locations_series = get_top_locations()
-
-    data = top_locations_series.to_frame(
-        name='value').reset_index(names=['Category'])
-
-    chart = alt.Chart(data).mark_bar().encode(
-        x=alt.X('Category:N', title='Category', sort=None),  # Use index as X-axis
-        y=alt.Y('value:Q', title='Tweet Count'),
-        text='Category:N'
-    )
-
-    st.altair_chart(chart, use_container_width=True)
-    # ------------- Top Locations ------------------
 
 with col1: 
     # ------------- High on Trend Over Time ------------------
@@ -141,21 +114,8 @@ with col1:
     st.altair_chart(chart, use_container_width=True)
     # ------------- Most Common Words tfidf ------------------
 
-with col2:
-    # ------------- Sentiment Analysis ------------------
-    sentiment = get_sentiment_results()
-    labels = list(sentiment.keys())
-    values = list(sentiment.values())
+# with col2:
 
-    # Create the pie chart using Matplotlib
-    plt.figure(figsize=(8, 8))  # Adjust the figure size as needed
-    plt.pie(values, labels=labels, autopct="%1.1f%%", startangle=90, colors=['#8ac926','#ffca3a','#ff595e',])  # Customize options
-    plt.title("Sentiment Analysis Distribution")
-
-    # Display the chart in Streamlit
-    st.pyplot()
-
-    # ------------- Sentiment Analysis ------------------
 # ------------- Topic Modelling ------------------
 topics_df = get_topic_modelling()
 st.dataframe(topics_df, use_container_width=True)

@@ -17,6 +17,10 @@ googletrans = "==4.0.0-rc1"
 matplotlib = "*"
 altair = "*"
 deep-translator = "*"
+beautifulsoup4 = "*"
+folium = "*"
+streamlit-folium = "*"
+geopy = "*"
 
 [dev-packages]
 
